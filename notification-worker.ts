@@ -48,3 +48,15 @@ await sub.subscribe("notifications", async (message) => {
     return;
   }
 });
+
+process.on("SIGINT", async () => {
+  await sub.quit();
+  await store.quit();
+  process.exit(0);
+});
+
+process.on("SIGTERM", async () => {
+  await sub.quit();
+  await store.quit();
+  process.exit(0);
+});
