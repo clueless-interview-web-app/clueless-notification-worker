@@ -24,7 +24,7 @@ const store = createClient({
 await sub.connect();
 await store.connect();
 
-const MAX_NOTIFCATIONS_TO_KEEP = 100;
+const MAX_NOTIFICATIONS_TO_KEEP = 5;
 
 await sub.subscribe("notifications", async (message) => {
   const { userId, text, type } = JSON.parse(message);
@@ -34,5 +34,5 @@ await sub.subscribe("notifications", async (message) => {
     type,
   };
   await store.lPush(key, JSON.stringify(notification));
-  await store.lTrim(key, 0, MAX_NOTIFCATIONS_TO_KEEP - 1);
+  await store.lTrim(key, 0, MAX_NOTIFICATIONS_TO_KEEP - 1);
 });
