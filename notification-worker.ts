@@ -28,11 +28,19 @@ const MAX_NOTIFICATIONS_TO_KEEP = 5;
 
 await sub.subscribe("notifications", async (message) => {
   const { userId, text, type } = JSON.parse(message);
-  const key = `notifications:${userId}`;
-  const notification = {
-    text,
-    type,
-  };
-  await store.lPush(key, JSON.stringify(notification));
-  await store.lTrim(key, 0, MAX_NOTIFICATIONS_TO_KEEP - 1);
+  const notification = { text, type };
+
+  if (type === "GLOBAL") {
+    const globalKey = `notifications:global`;
+    await store.lPush(globalKey, JSON.stringify(notification));
+    await store.lTrim(globalKey, 0, MAX_NOTIFICATIONS_TO_KEEP - 1);
+    return;
+  }
+
+  if (userId) {
+    const userKey = `notifications:${userId}`;
+    await store.lPush(userKey, JSON.stringify(notification));
+    await store.lTrim(userKey, 0, MAX_NOTIFICATIONS_TO_KEEP - 1);
+    return;
+  }
 });
