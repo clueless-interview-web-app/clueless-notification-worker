@@ -25,6 +25,16 @@ const store = createClient({
 await sub.connect();
 await store.connect();
 
+export const NotificationType = {
+  GOAL_PROGRESS: "GOAL_PROGRESS",
+  GENERAL: "GENERAL",
+  STREAK: "STREAK",
+  GLOBAL: "GLOBAL",
+} as const;
+
+export type NotificationType =
+  (typeof NotificationType)[keyof typeof NotificationType];
+
 const MAX_NOTIFICATIONS_TO_KEEP = 5;
 const GLOBAL_EXPIRE_SECONDS = 60 * 60 * 24; // 1 day
 
@@ -32,7 +42,7 @@ await sub.subscribe("notifications", async (message) => {
   const { userId, text, type } = JSON.parse(message);
 
   const notificationGlobal = { text, type, id: uuidv4() };
-  if (type === "GLOBAL") {
+  if (type === NotificationType.GLOBAL) {
     const globalKey = `notifications:global`;
     await store.lPush(globalKey, JSON.stringify(notificationGlobal));
     await store.lTrim(globalKey, 0, MAX_NOTIFICATIONS_TO_KEEP - 1);
